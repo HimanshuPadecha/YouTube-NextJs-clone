@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CopyCheckIcon, CopyIcon, ImagePlusIcon, MoreVerticalIcon, RotateCcwIcon, SparkleIcon, SparklesIcon, TrashIcon } from 'lucide-react'
+import { CopyCheckIcon, CopyIcon, ImagePlusIcon, Loader2Icon, MoreVerticalIcon, RotateCcwIcon, SparkleIcon, SparklesIcon, TrashIcon } from 'lucide-react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from '@/components/ui/input'
@@ -73,7 +73,23 @@ const FormSection = ({ videoId }: pageProps) => {
     const restore = trpc.videos.restoreThumbnail.useMutation({
         onSuccess: () => {
             utils.studio.getMany.invalidate()
-            utils.studio.getOne.invalidate({id:videoId})
+            utils.studio.getOne.invalidate({ id: videoId })
+        },
+        onError: () => {
+            toast.error("Something went wrong")
+        }
+    })
+    const generateTitle = trpc.videos.genarateTitle.useMutation({
+        onSuccess: () => {
+            toast.success("Background jop has started", { description: "This may take long" })
+        },
+        onError: () => {
+            toast.error("Something went wrong")
+        }
+    })
+    const generateDescription = trpc.videos.genarateDescription.useMutation({
+        onSuccess: () => {
+            toast.success("Background jop has started", { description: "This may take long" })
         },
         onError: () => {
             toast.error("Something went wrong")
@@ -102,14 +118,14 @@ const FormSection = ({ videoId }: pageProps) => {
         }, 2000)
     }
 
-    const [thumbnailModalOpen,setThumbnailModalOpen] = useState(false)
+    const [thumbnailModalOpen, setThumbnailModalOpen] = useState(false)
 
 
     return (
         <>
-        <ThumbnailUploadModal videoId={videoId} open={thumbnailModalOpen} onOpenChange={setThumbnailModalOpen}>
+            <ThumbnailUploadModal videoId={videoId} open={thumbnailModalOpen} onOpenChange={setThumbnailModalOpen}>
 
-        </ThumbnailUploadModal>
+            </ThumbnailUploadModal>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='flex items-center justify-between mb-6'>
@@ -130,7 +146,7 @@ const FormSection = ({ videoId }: pageProps) => {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align='start'>
-                                    <DropdownMenuItem onClick={() => remove.mutate({id:videoId})}>
+                                    <DropdownMenuItem onClick={() => remove.mutate({ id: videoId })}>
                                         <TrashIcon className='size-4 mr-2' />
                                         Delete
                                     </DropdownMenuItem>
@@ -148,7 +164,12 @@ const FormSection = ({ videoId }: pageProps) => {
                                 name="title"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Title</FormLabel>
+                                        <div className="flex items-center gap-x-2">
+                                            <FormLabel>Title</FormLabel>
+                                            <Button variant={"outline"} className="rounded-full size-6 [&_svg]:size-3" disabled={generateTitle.isPending || !video.muxTrackId} size={"icon"} type="button" onClick={() => generateTitle.mutate({ videoId })}>
+                                                {generateTitle.isPending ? <Loader2Icon className="animate-spin" /> : <SparklesIcon />}
+                                            </Button>
+                                        </div>
                                         <FormControl>
                                             <Input {...field} placeholder="Add a title to Your Video" />
                                         </FormControl>
@@ -161,7 +182,12 @@ const FormSection = ({ videoId }: pageProps) => {
                                 name="description"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Description</FormLabel>
+                                        <div className="flex items-center gap-x-2">
+                                            <FormLabel>Description</FormLabel>
+                                            <Button variant={"outline"} className="rounded-full size-6 [&_svg]:size-3" disabled={generateTitle.isPending || !video.muxTrackId} size={"icon"} type="button" onClick={() => generateDescription.mutate({ videoId })}>
+                                                {generateDescription.isPending ? <Loader2Icon className="animate-spin" /> : <SparklesIcon />}
+                                            </Button>
+                                        </div>
                                         <FormControl>
                                             <Textarea  {...field} value={field.value || ""}
                                                 placeholder="Enter the description"
@@ -174,44 +200,44 @@ const FormSection = ({ videoId }: pageProps) => {
                                 )}
                             />
 
-                            <FormField 
-                            name="thumbnailUrl"
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Thumbnail
-                                    </FormLabel>
-                                    <FormControl>
-                                        <div className="p-0.5 border-dashed border-neutral-400 relative h-[84px] w-[153px] group">
-                                            <Image 
-                                            fill
-                                            alt="thumbnail"
-                                            src={video.thumbnailUrl || "/placeholder.svg"}
-                                            className="object-cover"
-                                            />
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant={"ghost"} size={"icon"} type="button" className="bg-black/50 hover:bg-black/50 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7">
-                                                        <MoreVerticalIcon className="text-white"/> 
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="start" side="right">
+                            <FormField
+                                name="thumbnailUrl"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Thumbnail
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className="p-0.5 border-dashed border-neutral-400 relative h-[84px] w-[153px] group">
+                                                <Image
+                                                    fill
+                                                    alt="thumbnail"
+                                                    src={video.thumbnailUrl || "/placeholder.svg"}
+                                                    className="object-cover"
+                                                />
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant={"ghost"} size={"icon"} type="button" className="bg-black/50 hover:bg-black/50 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7">
+                                                            <MoreVerticalIcon className="text-white" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="start" side="right">
                                                         <DropdownMenuItem onClick={() => setThumbnailModalOpen(true)}>
-                                                            <ImagePlusIcon className="size-4 mr-1"/> Change
+                                                            <ImagePlusIcon className="size-4 mr-1" /> Change
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <SparklesIcon className="size-4 mr-1"/> AI-Generated
+                                                        <DropdownMenuItem onClick={() => { }}>
+                                                            <SparklesIcon className="size-4 mr-1" /> AI-Generated
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => restore.mutate({videoId})}>
-                                                            <RotateCcwIcon className="size-4 mr-1"/> Restore
+                                                        <DropdownMenuItem onClick={() => restore.mutate({ videoId })}>
+                                                            <RotateCcwIcon className="size-4 mr-1" /> Restore
                                                         </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </FormControl>
-                                </FormItem>
-                            )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
                             />
                             <FormField
                                 control={form.control}
