@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CopyCheckIcon, CopyIcon, ImagePlusIcon, Loader2Icon, MoreVerticalIcon, RotateCcwIcon, SparkleIcon, SparklesIcon, TrashIcon } from 'lucide-react'
+import { CopyCheckIcon, CopyIcon, ImagePlusIcon, Loader2Icon, MoreVerticalIcon, RotateCcwIcon, SparklesIcon, TrashIcon } from 'lucide-react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from '@/components/ui/input'
@@ -225,9 +225,6 @@ const FormSection = ({ videoId }: pageProps) => {
                                                     <DropdownMenuContent align="start" side="right">
                                                         <DropdownMenuItem onClick={() => setThumbnailModalOpen(true)}>
                                                             <ImagePlusIcon className="size-4 mr-1" /> Change
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => { }}>
-                                                            <SparklesIcon className="size-4 mr-1" /> AI-Generated
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => restore.mutate({ videoId })}>
                                                             <RotateCcwIcon className="size-4 mr-1" /> Restore
