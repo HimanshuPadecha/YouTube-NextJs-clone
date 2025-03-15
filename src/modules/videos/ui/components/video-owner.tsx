@@ -7,6 +7,7 @@ import { useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import SubscriptionButton from '@/modules/subscription/ui/components/subscription-button'
 import UserInfo from '@/modules/users/ui/components/user-info'
+import { useSubscriptions } from '@/modules/subscription/hooks/use-subscriptons'
 
 interface pageProps {
     user: VideoGetOneOutput["user"]
@@ -15,7 +16,8 @@ interface pageProps {
 
 const VideoOwner = ({ user, videoId }: pageProps) => {
 
-    const { userId: userClerkId } = useAuth()
+    const { userId: userClerkId , isLoaded } = useAuth()
+    const { isPending, onClick} = useSubscriptions({fromVideoId : videoId, isSubscribed : user.viewerSubscribed, userId : user.id})
 
     return (
         <div className='flex items-center sm:items-start justify-between sm:justify-start gap-3 min-w-0'>
@@ -31,7 +33,7 @@ const VideoOwner = ({ user, videoId }: pageProps) => {
                             size={"lg"}
                         />
                         <span>
-                            {0} Subscribers
+                            {user.subscribers} Subscribers
                         </span>
                     </div>
                 </div>
@@ -43,9 +45,9 @@ const VideoOwner = ({ user, videoId }: pageProps) => {
                     </Link>
                 </Button> :
                 <SubscriptionButton
-                    onClick={() => { }}
-                    disabled={false}
-                    isSubscribed={false}
+                    onClick={onClick}
+                    disabled={isPending || !isLoaded}
+                    isSubscribed={user.viewerSubscribed}
                     className='flex-none'
                 />
             }

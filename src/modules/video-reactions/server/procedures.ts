@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { videos, videosReactions } from "@/db/schema";
+import {  videosReactions } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { and, eq, or } from "drizzle-orm";
@@ -27,6 +27,7 @@ export const videoReactionsRouter = createTRPCRouter({
           )
         );
 
+      
       if (existingVideoReaction) {
         const [deletedLike] = await db
           .delete(videosReactions)
@@ -81,6 +82,7 @@ export const videoReactionsRouter = createTRPCRouter({
             eq(videosReactions.type, "dislike")
           )
         );
+
 
       if (existingVideoReaction) {
         const [deletedDislike] = await db
