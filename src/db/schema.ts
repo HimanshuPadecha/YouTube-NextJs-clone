@@ -14,6 +14,9 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 
+export const reactionType = pgEnum("reaction_type", ["like", "dislike"]);
+
+
 export const users = pgTable(
   "users",
   {
@@ -102,6 +105,19 @@ export const commentsInsertSchema = createInsertSchema(comments);
 export const commentsUpdateSchema = createUpdateSchema(comments);
 export const commentsSelectSchema = createUpdateSchema(comments);
 
+export const commentsReactions = pgTable("comments_reactions", { 
+  userId : uuid("user_id").references(() => users.id , {onDelete : "cascade"}).notNull(),
+  commentId : uuid("comment_id").references(() => comments.id , {onDelete : "cascade"}).notNull(),
+  type : reactionType("type").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+},(t) => [
+  primaryKey({
+    columns: [t.commentId,t.userId],
+    name:"comment_reactions_pk"
+  })
+])
+
 export const videoViews = pgTable(
   "video_views",
   {
@@ -128,7 +144,6 @@ export const videoViewsSelectionSchema = createSelectSchema(videoViews);
 export const videoViewsInsertSchema = createInsertSchema(videoViews);
 export const videoViewsUpdateSchema = createUpdateSchema(videoViews);
 
-export const reactionType = pgEnum("reaction_type", ["like", "dislike"]);
 
 export const videosReactions = pgTable(
   "videos_reactions",
